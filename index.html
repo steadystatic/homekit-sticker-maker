@@ -26,14 +26,16 @@
     <script>
       let entriesWrapper = document.querySelector('section.entry')
       let haveOriginal = window.sessionStorage.getItem('hkItem') || false
-      let hkItem = document.querySelectorAll('.homekitItem')
-      hkItem.forEach(function (item) {
-        if (!haveOriginal) {
-          window.sessionStorage.setItem('hkItem', item.innerHTML)
-        }
-        let codeInput = item.querySelector('.codeInput')
-        codeInput.addEventListener('keydown', validate)
-      })
+      function bind () {
+        let hkItem = document.querySelectorAll('.homekitItem')
+        hkItem.forEach(function (item) {
+          if (!haveOriginal) {
+            window.sessionStorage.setItem('hkItem', item.innerHTML)
+          }
+          let codeInput = item.querySelector('.codeInput')
+          codeInput.addEventListener('keydown', validate)
+        })
+      }
       function validate(evt) {
         let fauxInput = evt.target
         let theEvent = evt || window.event
@@ -61,7 +63,6 @@
             let regex = /[0-9]|\./
             let isNotAllowed = !regex.test(key)
             if (prevEvt) {
-                console.log('prev default')
               if(isNotAllowed) {
                 evt.preventDefault()
                 return
@@ -93,12 +94,10 @@
         let currentLn = evt.target.innerText.length
         let doneReplace = false
         let countToReplace = maxLn - (evt.target.dataset.content.length + evt.target.innerText.length - 1)
-        console.log('countToReplace', countToReplace, 'data content ln', evt.target.dataset.content.length, 'innerText ln', evt.target.innerText.length)
         while (countToReplace > 0) {
           switch (evt.target.innerText.length) {
             case 4:
             case 7:
-              console.log('time for a hyphen')
               appendString = '-'
               break
             default:
@@ -129,6 +128,9 @@
         let inputEl = target.parentNode.querySelector('.homekitCodeHidden')
         let entryLabel = target.parentNode.querySelector('.homekitLabel')
         let printLink = document.getElementById('pagePrint')
+        let newEntry = document.createElement('div')
+        let lastIndex = target.parentElement.parentElement.dataset.index
+        let newIndex = lastIndex++
         if (inputEl) {
           inputEl.value = target.innerText
         }
@@ -136,8 +138,16 @@
           // Show label and add another input
           // entryLabel.removeAttribute('hidden')
           printLink.style.display = 'inline'
+          newEntry.setAttribute('class', 'homekitItem')
+          newEntry.setAttribute('data-index', lastIndex++)
+          newEntry.innerHTML = window.sessionStorage.getItem('hkItem')
+          entriesWrapper.appendChild(newEntry)
+          bind()
+          // TODO focus next created input
+          // document.querySelector('.homekItem[data-index=' + newIndex + ']').focus()
         }
       }
+      window.onload = bind;
     </script>
   </body>
 </html>
