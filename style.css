@@ -1,0 +1,88 @@
+@font-face {
+  font-family: 'scancardiumregular';
+  src: url('scancardium-webfont.woff2') format('woff2'),
+       url('scancardium-webfont.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@media print {
+  @page {
+    size: 215.9mm 279.4mm; /* letter size */
+    /* you can also specify margins here: */
+    margin: 25mm;
+    margin-right: 45mm; /* for compatibility with both A4 and Letter */
+  }
+  section.header::after {
+    content: 'https://steadystatic.github.io/homekit-sticker-maker'
+  }
+  section.header h1, section.header p, section.header a {
+    display: none !important;
+  }
+  .homekitLogoBox:before {
+    content: url(homekit.png);
+  }
+  * {-webkit-print-color-adjust:exact;}
+}
+
+body {
+  font-family: "Helvetica Neue Thin", Helvetica, Arial, sans-serif;
+  font-size: 1.5em;
+  background: #fff;
+  color: #333;
+  text-align: center;
+}
+
+.header {
+  padding-bottom: .5em;
+}
+
+.header p {
+  padding-top: .5em;
+}
+
+.header a {
+  display: none;
+  position: absolute;
+}
+
+.homekitItem {
+  padding-top: 2em;
+  display: flex;
+  justify-content: center;
+}
+
+.homekitLogoBox {
+  background-image: url(homekit.svg);
+  background-repeat: no-repeat;
+  background-size: 90% 90%;
+  background-position: center;
+  border: 2px solid #000;
+  border-radius: 18px;
+  padding: .5em;
+  height: 2.5em;
+  width: 2.5em;
+}
+
+.homekitCode {
+  border: 2px solid #000;
+  font-family: "scancardiumregular";
+  margin-left: .5em;
+  overflow: hidden;
+  padding: 0.75em 1.5em 0 0.5em;
+  width: 5em;
+  font-size: 1.5em;
+}
+
+.codeInput {
+  line-height: 1em;
+  overflow: hidden;
+  outline: none;
+  white-space: nowrap;
+}
+
+.codeInput:after {
+  color: #333;
+  content: attr(data-content);
+  opacity: 0.25;
+}

@@ -1,12 +1,143 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Print Replacement Apple HomeKit Labels!</title>
-</head>
-<body>
-  <h1>HomeKit Label Maker</h1>
-  <p>Enter your 8-digit code and hit print!</p>
-  <input type="text" required="" pattern="\d{3}[\-]\d{3}[\-]\d{4}" value="" name="phones_pattern3" id="phones_pattern3" list="phones_pattern3_datalist" placeholder="Try it out." />
-</body>
+  <head>
+    <meta charset="UTF-8">
+    <title>Print Replacement Apple HomeKit Labels</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <section class="header">
+    <h1>HomeKit Label Maker</h1>
+    <p>Enter your 8-digit HomeKit codes then print on US Letter or A4 compatible paper.</p>
+    <a href="javascript:;" id="pagePrint" onclick="window.print()">Print!</a>
+    </section>
+    <section class="entry">
+      <div class="homekitItem" data-index="0">
+        <div class="homekitLogoBox"></div>
+        <div class="homekitCode">
+          <span class="codeInput" contenteditable="true" max="10" data-content="xxx-xx-xxx"></span>
+          <input hidden required type="text" pattern="\d{3}[\-]\d{2}[\-]\d{3}" maxlength="10" value="" class="homekitCodeHidden" placeholder="xxx-xx-xxx" />
+          <input hidden type="text" maxlength="255" pattern="[a-zA-Z0-9]+" value="" class="homekitLabel" placeholder="Optional Label e.g. Bedroom Lamp" />
+        </div>
+      </div>
+    </section>
+    <section class="display">
+    </section>
+    <script>
+      let entriesWrapper = document.querySelector('section.entry')
+      let haveOriginal = window.sessionStorage.getItem('hkItem') || false
+      let hkItem = document.querySelectorAll('.homekitItem')
+      hkItem.forEach(function (item) {
+        if (!haveOriginal) {
+          window.sessionStorage.setItem('hkItem', item.innerHTML)
+        }
+        let codeInput = item.querySelector('.codeInput')
+        codeInput.addEventListener('keydown', validate)
+      })
+      function validate(evt) {
+        let fauxInput = evt.target
+        let theEvent = evt || window.event
+        let key = theEvent.keyCode || theEvent.which
+        let prevEvt = theEvent.preventDefault
+        let appendString = ''
+        // Handle pasting codes
+        if (theEvent.type === 'paste') {
+          key = evt.clipboardData.getData('text/plain')
+        } else {
+          let atLimit = (parseInt(evt.target.attributes.max.value) <= evt.target.innerText.length)
+          key = String.fromCharCode(key)
+          // Handle backspaces
+          if (theEvent.keyCode === 8) {
+              prevEvt = false
+              appendPlaceholder(theEvent)
+          } else {
+            // Enforce limit
+            if (atLimit) {
+              logEntry(evt.target)
+              evt.preventDefault()
+              return
+            }
+            // Allow only numbers
+            let regex = /[0-9]|\./
+            let isNotAllowed = !regex.test(key)
+            if (prevEvt) {
+                console.log('prev default')
+              if(isNotAllowed) {
+                evt.preventDefault()
+                return
+              }
+              theEvent.returnValue = prevEvt
+            }
+            let rmChars = 1
+            let appendExtra = ''
+            switch (fauxInput.innerText.length) {
+              case 2:
+              case 5:
+                appendExtra = '-'
+                break
+            }
+            if (appendExtra.length) {
+              let newText = key + appendExtra
+              rmChars = 2
+              evt.target.textContent = evt.target.innerText + newText
+              evt.preventDefault()
+            }
+            evt.target.dataset.content = evt.target.dataset.content.substring(rmChars, evt.target.dataset.content.length)
+            // Set cursor position to end of user input
+            setCaret(evt.target, false)
+          }
+        }
+      }
+      function appendPlaceholder (evt) {
+        let maxLn = parseInt(evt.target.attributes.max.value)
+        let currentLn = evt.target.innerText.length
+        let doneReplace = false
+        let countToReplace = maxLn - (evt.target.dataset.content.length + evt.target.innerText.length - 1)
+        console.log('countToReplace', countToReplace, 'data content ln', evt.target.dataset.content.length, 'innerText ln', evt.target.innerText.length)
+        while (countToReplace > 0) {
+          switch (evt.target.innerText.length) {
+            case 4:
+            case 7:
+              console.log('time for a hyphen')
+              appendString = '-'
+              break
+            default:
+              appendString = 'x'
+              break
+          }
+          evt.target.dataset.content = appendString + evt.target.dataset.content
+          countToReplace--
+        }
+      }
+      function setCaret(target, isStart) {
+        const range = document.createRange()
+        const sel = window.getSelection()
+        if (isStart) {
+          const newText = document.createTextNode('')
+          target.appendChild(newText)
+          range.setStart(target.childNodes[0], 0)
+        }
+        else {
+          range.selectNodeContents(target)
+        }
+        range.collapse(isStart)
+        sel.removeAllRanges()
+        sel.addRange(range)
+        target.focus()
+      }
+      function logEntry (target) {
+        let inputEl = target.parentNode.querySelector('.homekitCodeHidden')
+        let entryLabel = target.parentNode.querySelector('.homekitLabel')
+        let printLink = document.getElementById('pagePrint')
+        if (inputEl) {
+          inputEl.value = target.innerText
+        }
+        if (inputEl.checkValidity()) {
+          // Show label and add another input
+          // entryLabel.removeAttribute('hidden')
+          printLink.style.display = 'inline'
+        }
+      }
+    </script>
+  </body>
 </html>
