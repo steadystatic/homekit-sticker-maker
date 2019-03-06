@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8">
-    <title>Print Replacement Apple HomeKit Labels</title>
+    <title>Print Replacement HomeKit Labels</title>
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
@@ -12,10 +12,10 @@
     <a href="javascript:;" id="pagePrint" onclick="window.print()">Print!</a>
     </section>
     <section class="entry">
-      <div class="homekitItem" data-index="0">
+      <div class="homekitItem" data-index="1">
         <div class="homekitLogoBox"></div>
         <div class="homekitCode">
-          <span class="codeInput" contenteditable="true" max="10" data-content="xxx-xx-xxx"></span>
+          <span class="codeInput" contenteditable="true" tabindex="1" max="10" data-content="xxx-xx-xxx"></span>
           <input hidden required type="text" pattern="\d{3}[\-]\d{2}[\-]\d{3}" maxlength="10" value="" class="homekitCodeHidden" placeholder="xxx-xx-xxx" />
           <input hidden type="text" maxlength="255" pattern="[a-zA-Z0-9]+" value="" class="homekitLabel" placeholder="Optional Label e.g. Bedroom Lamp" />
         </div>
@@ -24,12 +24,13 @@
     <section class="display">
     </section>
     <script>
+      let init = false
       let entriesWrapper = document.querySelector('section.entry')
-      let haveOriginal = window.sessionStorage.getItem('hkItem') || false
+      let haveOriginal = window.sessionStorage.getItem('hkItem')
       function bind () {
         let hkItem = document.querySelectorAll('.homekitItem')
         hkItem.forEach(function (item) {
-          if (!haveOriginal) {
+          if (!haveOriginal && init) {
             window.sessionStorage.setItem('hkItem', item.innerHTML)
           }
           let codeInput = item.querySelector('.codeInput')
@@ -129,24 +130,32 @@
         let entryLabel = target.parentNode.querySelector('.homekitLabel')
         let printLink = document.getElementById('pagePrint')
         let newEntry = document.createElement('div')
-        let lastIndex = target.parentElement.parentElement.dataset.index
-        let newIndex = lastIndex++
+        let newIndex = target.parentNode.querySelector('.codeInput').tabIndex
         if (inputEl) {
           inputEl.value = target.innerText
         }
         if (inputEl.checkValidity()) {
           // Show label and add another input
-          // entryLabel.removeAttribute('hidden')
+          let labelInput = document.createElement('span')
+          labelInput.setAttribute('class', 'itemLabel')
+          labelInput.setAttribute('contenteditable', 'true')
+          labelInput.setAttribute('data-content', 'Label')
+          labelInput.setAttribute('onclick', 'delete this.dataset.content')
+          labelInput.setAttribute('max', '125')
+          labelInput.setAttribute('onkeypress', 'return (this.innerText.length <= 20)')
+          target.parentElement.parentElement.appendChild(labelInput)
           printLink.style.display = 'inline'
           newEntry.setAttribute('class', 'homekitItem')
-          newEntry.setAttribute('data-index', lastIndex++)
-          newEntry.innerHTML = window.sessionStorage.getItem('hkItem')
-          entriesWrapper.appendChild(newEntry)
+          newEntry.setAttribute('data-index', newIndex)
+          newEntry.setAttribute('tabindex', newIndex)
+          newEntry.innerHTML = window.sessionStorage.getItem('hkItem').replace('tabindex="0"', 'tabindex="'+ newIndex + '"')
+          entriesWrapper.prepend(newEntry)
           bind()
-          // TODO focus next created input
-          // document.querySelector('.homekItem[data-index=' + newIndex + ']').focus()
+          let testEl = document.querySelector('.codeInput[tabindex="' + newIndex + '"]')
+          testEl.focus()
         }
       }
+      init = true
       window.onload = bind;
     </script>
   </body>
