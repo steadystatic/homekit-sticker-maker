@@ -77,6 +77,10 @@ body {
   display: inline-flex;
 }
 
+.homekitItem[data-modified="false"] .homekitCode {
+  background: rgba(0,0,0,0.10)
+}
+
 .codeInput {
   line-height: 1em;
   overflow: hidden;
@@ -107,9 +111,8 @@ body {
 @media print {
   @page {
     size: 215.9mm 279.4mm; /* letter size */
-    /* you can also specify margins here: */
     margin: 25mm;
-    margin-right: 45mm; /* for compatibility with both A4 and Letter */
+    margin-right: 45mm; /* compatibility with both A4 and Letter */
   }
   section.header::after {
     content: 'https://steadystatic.github.io/homekit-sticker-maker'
