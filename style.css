@@ -36,15 +36,16 @@ body {
 }
 
 .homekitLogoBox {
-  background-image: url(homekit.svg);
-  background-repeat: no-repeat;
-  background-size: contain;
-  background-position: center;
   border: 2px solid #000;
   border-radius: 18px;
   padding: .5em;
   height: 2.5em;
   width: 2.5em;
+}
+
+.homekitLogoBox img {
+  height: 100%;
+  width: 100%;
 }
 
 .homekitCode {
