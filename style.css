@@ -31,6 +31,8 @@ body {
 .homekitItem {
   padding-top: 2em;
   display: flex;
+  flex-flow: row wrap;
+  outline: none;
   position: relative;
   justify-content: center;
 }
@@ -58,6 +60,23 @@ body {
   font-size: 1.5em;
 }
 
+.removeItem {
+  color: #666;
+  display: none;
+  align-self: center;
+  order: -1;
+  padding-right: 1em;
+  text-decoration: none;
+}
+
+.homekitItem[data-modified="true"] {
+  margin-right: 1.6em;
+}
+
+.homekitItem[data-modified="true"] .removeItem {
+  display: inline-flex;
+}
+
 .codeInput {
   line-height: 1em;
   overflow: hidden;
@@ -72,21 +91,18 @@ body {
 }
 
 .itemLabel {
-  line-height: 4em;
   overflow: hidden;
-  white-space: nowrap;
   outline: none;
-  padding-left: 1em;
-  position: absolute;
-  margin-left: 10em;
-  right: 20%;
+  margin-top: 1em;
+  text-align: center;
+  white-space: nowrap;
+  width: 100%;
 }
 
 .itemLabel:after {
   content: attr(data-content);
   opacity: 0.25;
 }
-
 
 @media print {
   @page {
@@ -101,15 +117,20 @@ body {
   section.header h1, section.header p, section.header a {
     display: none !important;
   }
-  .itemLabel:empty {
+  .itemLabel:empty, .homekitItem[data-modified="false"] {
     display: none;
   }
   .itemLabel {
-    right: 1em;
+    text-align: left;
+    text-indent: 1.5em;
   }
   .homekitItem {
     justify-content: left;
     zoom: 50%;
+  }
+  .removeItem {
+    display: none;
+    visibility: hidden;
   }
   * {-webkit-print-color-adjust:exact;}
 }

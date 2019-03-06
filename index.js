@@ -1,17 +1,18 @@
-let init = false
 let entriesWrapper = document.querySelector('section.entry')
-let haveOriginal = window.sessionStorage.getItem('hkItem')
+let haveOriginal = (typeof window.sessionStorage.getItem('hkItem') === 'string')
 function bind () {
   let hkItem = document.querySelectorAll('.homekitItem')
   hkItem.forEach(function (item) {
-    if (!haveOriginal && init) {
+    if (!haveOriginal) {
       window.sessionStorage.setItem('hkItem', item.innerHTML)
+      haveOriginal = true
+      console.log('set hkitem')
     }
     let codeInput = item.querySelector('.codeInput')
     codeInput.addEventListener('keydown', validate)
   })
 }
-function validate(evt) {
+function validate (evt) {
   let fauxInput = evt.target
   let theEvent = evt || window.event
   let key = theEvent.keyCode || theEvent.which
@@ -26,7 +27,9 @@ function validate(evt) {
     // Handle backspaces
     if (theEvent.keyCode === 8) {
         prevEvt = false
-        appendPlaceholder(theEvent)
+        if (evt.target.innerText.length > 0) {
+          appendPlaceholder(theEvent)
+        }
     } else {
       // Enforce limit
       if (atLimit) {
@@ -83,7 +86,7 @@ function appendPlaceholder (evt) {
     countToReplace--
   }
 }
-function setCaret(target, isStart) {
+function setCaret (target, isStart) {
   const range = document.createRange()
   const sel = window.getSelection()
   if (isStart) {
@@ -101,7 +104,7 @@ function setCaret(target, isStart) {
 }
 function logEntry (target) {
   let inputEl = target.parentNode.querySelector('.homekitCodeHidden')
-  let entryLabel = target.parentNode.querySelector('.homekitLabel')
+  let entryRemove = target.parentElement.parentElement.querySelector('.removeItem')
   let printLink = document.getElementById('pagePrint')
   let newEntry = document.createElement('div')
   let newIndex = target.parentNode.querySelector('.codeInput').tabIndex
@@ -111,23 +114,28 @@ function logEntry (target) {
   if (inputEl.checkValidity()) {
     // Show label and add another input
     let labelInput = document.createElement('span')
+    target.parentElement.parentElement.setAttribute('data-modified', true)
     labelInput.setAttribute('class', 'itemLabel')
     labelInput.setAttribute('contenteditable', 'true')
-    labelInput.setAttribute('data-content', 'Label')
+    labelInput.setAttribute('data-content', 'Description')
     labelInput.setAttribute('onclick', 'delete this.dataset.content')
     labelInput.setAttribute('max', '125')
-    labelInput.setAttribute('onkeypress', 'return (this.innerText.length <= 20)')
+    labelInput.setAttribute('onkeypress', 'return (this.innerText.length <= 35)')
     target.parentElement.parentElement.appendChild(labelInput)
     printLink.style.display = 'inline'
     newEntry.setAttribute('class', 'homekitItem')
     newEntry.setAttribute('data-index', newIndex)
     newEntry.setAttribute('tabindex', newIndex)
+    newEntry.setAttribute('data-modified', false)
     newEntry.innerHTML = window.sessionStorage.getItem('hkItem').replace('tabindex="0"', 'tabindex="'+ newIndex + '"')
     entriesWrapper.prepend(newEntry)
+    entryRemove.addEventListener('click', removeRow)
     bind()
     let testEl = document.querySelector('.codeInput[tabindex="' + newIndex + '"]')
     testEl.focus()
   }
 }
-init = true
+function removeRow (evt) {
+  evt.target.parentElement.innerHTML = ''
+}
 window.onload = bind;

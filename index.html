@@ -12,13 +12,14 @@
       <a href="javascript:;" id="pagePrint" onclick="window.print()">Print!</a>
     </section>
     <section class="entry">
-      <div class="homekitItem" data-index="1">
+      <div class="homekitItem" data-index="1" data-modified="false">
         <div class="homekitLogoBox"><img src="homekit.png" /></div>
         <div class="homekitCode">
           <span class="codeInput" contenteditable="true" tabindex="1" max="10" data-content="xxx-xx-xxx"></span>
           <input hidden required type="text" pattern="\d{3}[\-]\d{2}[\-]\d{3}" maxlength="10" value="" class="homekitCodeHidden" placeholder="xxx-xx-xxx" />
           <input hidden type="text" maxlength="255" pattern="[a-zA-Z0-9]+" value="" class="homekitLabel" placeholder="Optional Label e.g. Bedroom Lamp" />
         </div>
+        <a class="removeItem" href="javascript:;" title="Remove HomeKit Item">X</a>
       </div>
     </section>
     <script src="index.js"></script>
